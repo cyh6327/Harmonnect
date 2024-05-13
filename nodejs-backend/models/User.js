@@ -1,58 +1,62 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // Sequelize 설정
 
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASS,
-    port: process.env.DB_PORT,
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  google_id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    defaulteValue: DataTypes.DATE(Date.now)
+  },
+  refreshtoken: {
+    type: DataTypes.TEXT
+  },
+  expirydate: {
+    type: DataTypes.DATE
+  }
+}, {
+  timestamps: false
 });
 
-class User {
-    static async findById(id) {
-        const query = {
-            text: 'SELECT * FROM users WHERE id = $1',
-            values: [id]
-        };
+// accessToken의 만료여부를 체크
+User.prototype.isAccessTokenExpired = function() {
+  return Date.now() >= this.expiryDate;
+};
 
-        try {
-            const { rows } = await pool.query(query);
-            if (rows.length > 0) {
-                return rows[0];  // Return the user
-            } else {
-                return null;  // User not found
-            }
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
+User.findOrCreateUser = async function(googleProfile) {
+  console.log('Calling findOrCreate with:', googleProfile);
+  const [user, created] = await User.findOrCreate({
+    where: { google_id: googleProfile.id },
+    defaults: { // findOrCreate 메서드의 defaults 옵션은 새로 생성될 때 사용될 기본값 지정
+      google_id: googleProfile.id,
+      name: googleProfile.displayName,
+      email: googleProfile.emails[0].value
     }
+  });
 
-    static async findOrCreate({ googleId, name, email }) {
-        const queryFind = {
-            text: 'SELECT * FROM users WHERE google_id = $1',
-            values: [googleId]
-        };
+  if (created) {
+    console.log('새로운 사용자가 생성되었습니다.');
+  } else {
+    console.log('기존의 사용자가 반환되었습니다.');
+  }
 
-        try {
-            const res = await pool.query(queryFind);
-            if (res.rows.length) {
-                return res.rows[0];  // User found
-            } else {
-                // User not found, create new
-                const queryCreate = {
-                    text: 'INSERT INTO users (google_id, name, email) VALUES ($1, $2, $3) RETURNING *',
-                    values: [googleId, name, email]
-                };
-                const result = await pool.query(queryCreate);
-                return result.rows[0];  // Return new user
-            }
-        } catch (err) {
-            console.error('Error executing query', err.stack);
-            throw err;
-        }
-    }
+  return user;
 }
 
 module.exports = User;
