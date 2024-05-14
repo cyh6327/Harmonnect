@@ -6,9 +6,17 @@ const session = require('express-session');
 const crypto = require('crypto');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/authRoutes');
+const cors = require('cors');
+
+const corsOptions = {
+  origin: 'http://localhost:3000', // 허용할 도메인
+  optionsSuccessStatus: 200, // 일부 브라우저에서의 CORS 문제가 해결되도록 상태 설정
+};
 
 const app = express();
 const secret = crypto.randomBytes(64).toString('hex');
+
+app.use(cors(corsOptions));
 
 app.use(session({
     secret: secret,
@@ -19,6 +27,10 @@ app.use(session({
 
 app.get('/', async (req, res) => {
   res.send(`dashboard`);
+});
+
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server Connected' });
 });
 
 // Passport 초기화
