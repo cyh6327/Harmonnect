@@ -9,11 +9,11 @@ function Header() {
   const { darkMode, toggleDarkMode } = useDarkMode();
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50 bg-transparent dark:bg-transparent dark:custom-dark-text">
+    <header className="absolute inset-x-0 top-0 z-50 bg-transparent dark:bg-transparent dark:text-custom-dark-text">
         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
             <div className="flex lg:flex-1">
                 <a href="#" className="-m-1.5 p-1.5">
-                <span className="dark:custom-dark-text text-gray-900 text-xl font-bold">Harmonnect</span>
+                <span className="dark:text-custom-dark-text text-gray-900 text-xl font-bold">Harmonnect</span>
                 </a>
             </div>
             <div className="flex lg:hidden">
@@ -26,7 +26,7 @@ function Header() {
                 </button>
             </div>
             <div className="hidden lg:flex lg:gap-x-12">
-                <a className="text-sm font-semibold leading-6 text-gray-900 dark:custom-dark-text">
+                <a className="text-sm font-semibold leading-6 text-gray-900 dark:text-custom-dark-text">
                     Playlist
                 </a>
             </div>
