@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
+const { sequelize } = require('./models/User');
 
 const corsOptions = {
   origin: 'http://localhost:3000', // 허용할 도메인
@@ -15,6 +16,14 @@ const corsOptions = {
 
 const app = express();
 const secret = crypto.randomBytes(64).toString('hex');
+
+sequelize.sync()
+  .then(() => {
+    console.log('Users 테이블이 성공적으로 생성되었습니다.');
+  })
+  .catch(error => {
+    console.error('테이블 생성 중 오류가 발생했습니다:', error);
+  });
 
 app.use(cors(corsOptions));
 

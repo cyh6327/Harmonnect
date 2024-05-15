@@ -31,6 +31,7 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE
   }
 }, {
+  tableName: 'Users',
   timestamps: false
 });
 
