@@ -7,8 +7,18 @@ router.get('/google/callback', authController.googleCallback, authController.pos
 
 // 로그아웃 라우트
 router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect(`${process.env.CLIENT_URL}/`);
+  });
+});
+
+router.get('/session-message', (req, res) => {
+  const message = req.session.toastMessage || '';
+  req.session.toastMessage = ''; // 메시지 한번 사용 후 삭제
+  res.json({ message });
 });
 
 module.exports = router;

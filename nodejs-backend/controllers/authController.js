@@ -20,7 +20,9 @@ exports.postGoogleLogin = (req, res) => {
         const refreshToken = queryData.code;
         console.log(`refreshToken : ${refreshToken}`);
         
-        res.redirect('/')
+        // React 앱의 URL로 리다이렉트하며 로그인 메시지 추가
+        req.session.toastMessage = '로그인 되었습니다.';
+        res.redirect(`${process.env.CLIENT_URL}/`);
     } else {
         res.redirect('/auth/google'); // 실패 시 다시 Google 로그인으로 리다이렉션
     }
