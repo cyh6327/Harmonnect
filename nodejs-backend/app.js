@@ -11,6 +11,7 @@ const { sequelize } = require('./models/User');
 
 const corsOptions = {
   origin: 'http://localhost:3000', // 허용할 도메인
+  credentials: true,
   optionsSuccessStatus: 200, // 일부 브라우저에서의 CORS 문제가 해결되도록 상태 설정
 };
 
@@ -30,7 +31,7 @@ app.use(cors(corsOptions));
 app.use(session({
     secret: secret,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { secure: false } // 실제 배포 시에는 true로 설정
 }));
 

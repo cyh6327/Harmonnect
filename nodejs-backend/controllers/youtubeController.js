@@ -23,15 +23,15 @@ exports.getLikedYoutubeMusic = async (req, res) => {
     let musicVideos = [];
 
     try {
-        // 사용자의 '좋아요' 목록에서 비디오 가져오기
-        const likedVideosResponse = await youtube.videos.list({
-            part: 'snippet,contentDetails',
-            myRating: 'like', // 사용자가 '좋아요'를 누른 비디오
-            maxResults: 50,
-            pageToken: nextPageToken
-        });
+        do {
+            // 사용자의 '좋아요' 목록에서 비디오 가져오기
+            const likedVideosResponse = await youtube.videos.list({
+                part: 'snippet,contentDetails',
+                myRating: 'like', // 사용자가 '좋아요'를 누른 비디오
+                maxResults: 50,
+                pageToken: nextPageToken
+            });
 
-        while (musicVideos.length < 10) {
             const detailedVideos = likedVideosResponse.data.items;
 
             // 음악 카테고리(카테고리 ID가 '10')로 필터링
@@ -39,19 +39,9 @@ exports.getLikedYoutubeMusic = async (req, res) => {
 
             musicVideos = musicVideos.concat(filteredMusicVideos);
 
-            // 더 이상 페이지가 없으면 반복 중지
-            if (!likedVideosResponse.data.nextPageToken) {
-                break;
-            }
-
             nextPageToken = likedVideosResponse.data.nextPageToken;
-        }
-
-        // 최대 50개의 비디오로 제한
-        musicVideos = musicVideos.slice(0, 10);
-        
+        } while (nextPageToken);   
         res.send(musicVideos);
-
     } catch (err) {
         console.error('Error fetching YouTube videos', err);
         throw err;
