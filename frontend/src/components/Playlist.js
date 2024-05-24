@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MusicBox from './MusicBox';
 import axiosInstance from '../utils/axiosInstance';
 
 function Playlist() {
     const [music, setMusic] = useState([]);
+
+    useEffect(() => {
+        getSavedMusic();
+    }, []);
+
+    const getSavedMusic = () => {
+        try {
+            const response = axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music`);
+        } catch(error) {
+            console.log(error);
+        }
+    }
 
     const getYoutubeMusic = async () => {
         try {
