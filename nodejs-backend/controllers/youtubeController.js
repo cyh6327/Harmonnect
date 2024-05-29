@@ -2,37 +2,115 @@ const { google } = require('googleapis');
 const passport = require('passport');
 const Music = require('../models/Music');
 const User = require('../models/User');
+const axios = require('axios');
+const qs = require('qs');
 
-//exports.getSesstion = passport.authenticate('session');
+let spotifyToken = "";
 
-async function getOffset(userId) {
+async function getSpotifyAccessToken() {
+    const url = 'https://accounts.spotify.com/api/token';
+    const data = qs.stringify({
+        grant_type: 'client_credentials',
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        client_secret: process.env.SPOTIFY_CLIENT_SECRET
+    });
+
     try {
-      const user = await User.findOne({ where: { google_id: userId } });
-      return user ? user.offset : 0;
+        const response = await axios.post(url, data, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        console.log('Response:', response.data);
+        return response.data;
     } catch (error) {
-      console.error('Error fetching offset:', error);
-      throw error;
+        console.error('Error:', error);
     }
 }
 
-exports.getSavedMusic = async (req, res) => {
+async function getSpotifyMusicInfo(tags) {
+    if(spotifyToken == "") {
+        spotifyToken = await getSpotifyAccessToken();
+    }
+
+    console.log(`spotifyToken : ${spotifyToken}`);
+    console.log(`tags : ${tags} , ${typeof tags}`);
+    
+    for(const tag of tags) {
+        const url = `https://api.spotify.com/v1/search?q=${tag}&type=track&limit=1&offset=1`;
+        axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${spotifyToken}`
+            }
+        })
+        .then(response => {
+            console.log('Spotify Response:', response.data);
+            //return response.data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+}
+
+async function insertMusics(musicVideos) {
+    let musics = [];
+    for(const music of musicVideos) {
+        let data = { 
+            vedio_id: music.id,
+            google_id: req.user.google_id,
+        }
+        musics.push(data);
+    }
+
+    Music.bulkCreate(musics)
+    .then(() => {
+        console.log('Music have been inserted');
+    })
+    .catch(err => {
+        console.error('Failed to insert musics:', err);
+    });
+}
+
+exports.getUnusedMusic = (req, res) => {
     const userId = req.user.id;
-    const offset = getOffset(userId);
+    console.log(`getUnusedMusic............................... userId = ${userId}`);
 
-    const musicList = await Music.findAll({ offset : offset, limit: 10 });
+    const unUsedMusics = Music.findAll({ where : { status : 'unused', user_id : userId } });
 
-    // db에 저장된 플레이리스트가 10개 미만인 경우 api 를 통해 가져온다
-    if(musicList.length > 10) {
-        getLikedYoutubeMusic();
+    if(unUsedMusics.length > 0) {
+        res.json(unUsedMusics);
     } else {
-        res.json(musicList);
+        res.json({ message: "No music found", data: [] });
     }
 }
 
-const getLikedYoutubeMusic = async (req, res) => {
+exports.getUnshownMusic = async (req, res) => {
+    const userId = req.user.id;
+    console.log(`getUnshownMusic............................... userId = ${userId}`);
+
+    const unshownCount = await Music.count({ where: { status: 'unshown' } }); 
+    
+    // unShownMusics 가 10 미만이면 유튜브 api 로 데이터를 받아온다
+    if(unshownCount < 10) {
+        await getLikedYoutubeMusic(req.user);
+    } 
+
+    const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId , limit : 10 } });
+
+    if(unshownMusics.length > 0) {
+        res.json(unshownMusics);
+    } else {
+        res.json({ message: "No music found", data: [] });
+    }
+}
+
+const getLikedYoutubeMusic = async (user) => {
+    console.log(`getLikedYoutubeMusic................`);
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({
-        access_token: req.user.accessToken
+        access_token: user.accessToken
     });
 
     const youtube = google.youtube({
@@ -60,7 +138,11 @@ const getLikedYoutubeMusic = async (req, res) => {
             // 음악 카테고리(카테고리 ID가 '10')로 필터링
             const filteredMusicVideos = detailedVideos.filter(video => video.snippet.categoryId === '10');
 
-            musicVideos = musicVideos.concat(filteredMusicVideos);
+            for(const music of filteredMusicVideos) {
+                getSpotifyMusicInfo(music.snippet.tags);
+            }
+
+            //musicVideos = musicVideos.concat(filteredMusicVideos);
             
             console.log(`musicVideos length : ${musicVideos.length}`)
 
@@ -71,6 +153,7 @@ const getLikedYoutubeMusic = async (req, res) => {
         throw err;
     }
 
+    //getSpotifyMusicInfo(musicVideos)
     // 데이터베이스에 저장
     //insertMusics(musicVideos);
 

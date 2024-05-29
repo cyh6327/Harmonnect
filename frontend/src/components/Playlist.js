@@ -7,15 +7,45 @@ function Playlist() {
     const [music, setMusic] = useState([]);
 
     useEffect(() => {
-        getSavedMusic();
+        getUnusedMusic();
     }, []);
 
-    const getSavedMusic = () => {
-        try {
-            const response = axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music`);
-        } catch(error) {
-            console.log(error);
-        }
+    const addMusic = (newMusic) => {
+        setMusic((prevMusic) => [...prevMusic, newMusic]);
+    };
+
+    const getUnusedMusic = () => {
+        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/unused`)
+        .then(response => {
+            const data = response.data;
+            if (data.data && data.data.length > 0) {
+                console.log('Music list:', data.data);
+                setMusic(data.data);
+            } else {
+                // musicList가 없을 때 처리
+                console.log(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+
+    const getUnshownMusic = () => {
+        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/unshown`)
+        .then(response => {
+            const data = response.data;
+            if (data.data && data.data.length > 0) {
+                console.log('Music list:', data.data);
+                addMusic(data.data);
+            } else {
+                // musicList가 없을 때 처리
+                console.log(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
     }
 
     const getYoutubeMusic = async () => {
@@ -33,7 +63,7 @@ function Playlist() {
     return (
         <div className="text-center">
             <button 
-                onClick={getYoutubeMusic} 
+                onClick={getUnshownMusic} 
                 class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
             >
                 Get Youtube Music

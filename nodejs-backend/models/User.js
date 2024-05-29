@@ -29,10 +29,6 @@ const User = sequelize.define('User', {
   },
   expirydate: {
     type: DataTypes.DATE
-  },
-  offset: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
   }
 }, {
   tableName: 'Users',

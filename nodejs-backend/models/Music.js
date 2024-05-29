@@ -11,10 +11,9 @@ const Music = sequelize.define('Music', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  google_id: {
-    type: DataTypes.STRING,
+  user_id: {
+    type: DataTypes.INTEGER,
     allowNull: false,
-    unique: true
   },
   title: {
     type: DataTypes.STRING,
@@ -26,6 +25,29 @@ const Music = sequelize.define('Music', {
   },
   thumbnail: {
     type: DataTypes.TEXT,
+    allowNull: false
+  },
+  comment: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM,
+    values: ['unused', 'added', 'unshown'],
+    defaultValue: 'unused',
+    allowNull: false
+  },
+  tag: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  profile_added_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  like_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
     allowNull: false
   }
 }, {

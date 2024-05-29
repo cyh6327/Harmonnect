@@ -22,7 +22,8 @@ router.get('/dbtest', async (req, res) => {
       }
 })
 
-router.get('/music', youtubeController.getSavedMusic);
+router.get('/music/unused', youtubeController.getUnusedMusic);
+router.get('/music/unshown', youtubeController.getUnshownMusic);
 //router.get('/youtube/data', youtubeController.getSesstion, youtubeController.getLikedYoutubeMusic);
 
 module.exports = router;
