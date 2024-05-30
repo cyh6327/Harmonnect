@@ -25,5 +25,6 @@ router.get('/dbtest', async (req, res) => {
 router.get('/music/unused', youtubeController.getUnusedMusic);
 router.get('/music/unshown', youtubeController.getUnshownMusic);
 //router.get('/youtube/data', youtubeController.getSesstion, youtubeController.getLikedYoutubeMusic);
+// router.get('/test', youtubeController.getSpotifyAccessToken, youtubeController.getSpotifyMusicInfo);
 
 module.exports = router;
