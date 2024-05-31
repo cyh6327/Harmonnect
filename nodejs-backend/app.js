@@ -18,7 +18,7 @@ const corsOptions = {
 const app = express();
 const secret = crypto.randomBytes(64).toString('hex');
 
-sequelize.sync({ force: true })
+sequelize.sync()
   .then(() => {
     console.log('모든 테이블이 성공적으로 동기화되었습니다.');
   })

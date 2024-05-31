@@ -3,102 +3,24 @@ const passport = require('passport');
 const Music = require('../models/Music');
 const User = require('../models/User');
 const axios = require('axios');
-const qs = require('qs');
 
-let spotifyToken = "";
-
-const getSpotifyAccessToken = async () => {
-    const url = 'https://accounts.spotify.com/api/token';
-    const data = qs.stringify({
-        grant_type: 'client_credentials',
-        client_id: process.env.SPOTIFY_CLIENT_ID,
-        client_secret: process.env.SPOTIFY_CLIENT_SECRET
-    });
-
-    try {
-        const response = await axios.post(url, data, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-        console.log('Response:', response.data);
-        spotifyToken = response.data.access_token;
-        return response.data.access_token;
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-const blah = async (musicVideos) => {
-    let insertData = [];
-
-    for(const music of musicVideos) {
-        let tagList = music.snippet.tags;
-
-        for(const tag of tagList) {
-            const result = await getSpotifyMusicInfo(tag);
-            console.log(result);
-            // const target = result.title;
-
-            // const title = music.snippet.title;
-            // const regex = new RegExp(target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            // const isCorrectTitle = regex.test(title);
-
-            // if(isCorrectTitle) {
-            //     insertData.push(result);
-            //     break;
-            // }
-        }
-    }
-
-    console.log(insertData, insertData.length);
-}
-
-const getSpotifyMusicInfo = async (tag) => {
-    if(spotifyToken == "") {
-        spotifyToken = await getSpotifyAccessToken();
-    }
-
-    console.log(`spotifyToken : ${JSON.stringify(spotifyToken)}`);
-    console.log(`tag : ${tag} , ${typeof tag}`);
-
-    const url = `https://api.spotify.com/v1/search?q=${tag}&type=track&limit=1&offset=1`;
-    await axios.get(url, {
-        headers: {
-            'Authorization': `Bearer ${spotifyToken}`
-        }
-    })
-    .then(response => {
-        const resData = response.data;
-        const title = resData.tracks.items[0].name;
-        const artist = resData.tracks.items[0].artists[0].name;
-        console.log(`spotify responed .... title : ${title} | artist : ${artist}` );
-        
-        const result = {
-            "title" : title,
-            "artist" : artist,
-        }
-
-        return result;
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-async function insertMusics(musicVideos) {
+async function insertMusics(user, musicVideos) {
     let musics = [];
     for(const music of musicVideos) {
         let data = { 
-            vedio_id: music.id,
-            google_id: req.user.google_id,
+            video_id: music.id,
+            user_id: user.id,
+            title: music.snippet.title,
+            thumbnail: music.snippet.thumbnails.default.url,
+            status: 'unshown'
         }
         musics.push(data);
     }
 
-    Music.bulkCreate(musics)
+    await Music.bulkCreate(musics)
     .then(() => {
         console.log('Music have been inserted');
+
     })
     .catch(err => {
         console.error('Failed to insert musics:', err);
@@ -122,14 +44,15 @@ exports.getUnshownMusic = async (req, res) => {
     const userId = req.user.id;
     console.log(`getUnshownMusic............................... userId = ${userId}`);
 
-    const unshownCount = await Music.count({ where: { status: 'unshown' } }); 
+    // const unshownCount = await Music.count({ where: { status: 'unshown' } }); 
     
-    // unShownMusics 가 10 미만이면 유튜브 api 로 데이터를 받아온다
-    if(unshownCount < 10) {
-        await getLikedYoutubeMusic(req.user);
-    } 
+    // // unShownMusics 가 10 미만이면 유튜브 api 로 데이터를 받아온다
+    // if(unshownCount < 10) {
+    //     await getLikedYoutubeMusic(req.user);
+    // } 
 
     const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 });
+    console.log(`unshownMusics..... ${JSON.stringify(unshownMusics)}`)
 
     if(unshownMusics.length > 0) {
         res.json(unshownMusics);
@@ -181,11 +104,5 @@ const getLikedYoutubeMusic = async (user) => {
         throw err;
     }
 
-    blah(musicVideos)
-
-    //getSpotifyMusicInfo(musicVideos)
-    // 데이터베이스에 저장
-    //insertMusics(musicVideos);
-
-    //res.send(musicVideos);
+    await insertMusics(user, musicVideos);
 };

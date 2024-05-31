@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
                     }}
                 />
             </div>
-            <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+            <div className="mx-auto max-w-4xl">
                 {children}
             </div>
         </div>

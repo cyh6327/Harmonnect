@@ -19,10 +19,6 @@ const Music = sequelize.define('Music', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  artist: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   thumbnail: {
     type: DataTypes.TEXT,
     allowNull: false
