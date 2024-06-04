@@ -29,8 +29,8 @@ const Music = sequelize.define('Music', {
   },
   status: {
     type: DataTypes.ENUM,
-    values: ['unused', 'added', 'unshown'],
-    defaultValue: 'unused',
+    values: ['default', 'added', 'unshown'],
+    defaultValue: 'default',
     allowNull: false
   },
   tag: {

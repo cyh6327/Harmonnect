@@ -7,10 +7,10 @@ function Playlist() {
     const [music, setMusic] = useState([]);
 
     useEffect(() => {
-        getUnusedMusic();
+        getDefaultMusic();
     }, []);
 
-    const getUnusedMusic = () => {
+    const getDefaultMusic = () => {
         axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/unused`)
         .then(response => {
             const data = response.data;
@@ -46,17 +46,15 @@ function Playlist() {
         });
     }
 
-    const getYoutubeMusic = async () => {
-        try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/youtube/data`);
-            setMusic(response.data);
-            console.log(music);
-            //setLoading(false);
-          } catch (error) {
-            // setError('Failed to fetch data');
-            // setLoading(false);
-          }
-    };
+    const addToUserProfile = () => {
+        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`)
+        .then(response => {
+            
+        })
+        .catch(error => {
+            console.error('Error addToUserProfile:', error);
+        });
+    }
 
     return (
         <div className='text-center py-10'>
@@ -65,6 +63,12 @@ function Playlist() {
                 class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
             >
                 Get Youtube Music
+            </button>
+            <button 
+                onClick={addToUserProfile} 
+                class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
+            >
+                Add to My Profile
             </button>
             <div className="text-center py-10">
 

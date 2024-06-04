@@ -3,6 +3,11 @@ import React from 'react';
 const MusicBox = ({ index, id, title, image }) => {
   return (
     <tr key={id} className="border-b border-gray-700 last:border-none">
+    <td>
+        <label className="inline-flex items-center">
+          <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" />
+        </label>
+    </td>
     {<td className="p-3">{index + 1}</td> }
     <td className="p-3">
         <div className="flex items-center">

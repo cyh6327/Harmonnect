@@ -27,14 +27,14 @@ async function insertMusics(user, musicVideos) {
     });
 }
 
-exports.getUnusedMusic = (req, res) => {
+exports.getDefaultMusic = (req, res) => {
     const userId = req.user.id;
-    console.log(`getUnusedMusic............................... userId = ${userId}`);
+    console.log(`getDefaultMusic............................... userId = ${userId}`);
 
-    const unUsedMusics = Music.findAll({ where : { status : 'unused', user_id : userId } });
+    const defaultMusics = Music.findAll({ where : { status : 'default', user_id : userId } });
 
-    if(unUsedMusics.length > 0) {
-        res.json(unUsedMusics);
+    if(defaultMusics.length > 0) {
+        res.json(defaultMusics);
     } else {
         res.json({ message: "No music found", data: [] });
     }
@@ -51,14 +51,43 @@ exports.getUnshownMusic = async (req, res) => {
     //     await getLikedYoutubeMusic(req.user);
     // } 
 
-    const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 });
-    console.log(`unshownMusics..... ${JSON.stringify(unshownMusics)}`)
+    // const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 });
+    // console.log(`unshownMusics..... ${JSON.stringify(unshownMusics)}`)
 
-    if(unshownMusics.length > 0) {
-        res.json(unshownMusics);
-    } else {
-        res.json({ message: "No music found", data: [] });
-    }
+    Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 })
+    .then(musics => {
+        // 가져온 데이터를 업데이트할 내용으로 변경
+        const updatedData = musics.map(music => ({
+            id: music.id,
+            video_id: music.video_id,
+            user_id: music.user_id,
+            title: music.title,
+            thumbnail: music.thumbnail,
+            status: 'default'
+        }));
+
+        // 업데이트된 데이터를 반영
+        return Promise.all(updatedData.map(data => {
+            return Music.update(data, { where: { id: data.id } });
+        }));
+    })
+    .then(() => {
+        console.log('데이터가 업데이트되었습니다.');
+        return Music.findAll({ limit: 10 });
+    })
+    .then(updatedMusics => {
+        // 클라이언트에 업데이트된 User 데이터를 JSON 형태로 응답
+        res.json(updatedMusics);
+    })
+    .catch(err => {
+        console.error('데이터 업데이트 중 오류 발생:', err);
+    });
+
+    // if(unshownMusics.length > 0) {
+    //     res.json(unshownMusics);
+    // } else {
+    //     res.json({ message: "No music found", data: [] });
+    // }
 }
 
 const getLikedYoutubeMusic = async (user) => {
