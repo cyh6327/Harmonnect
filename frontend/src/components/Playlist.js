@@ -5,13 +5,15 @@ import axiosInstance from '../utils/axiosInstance';
 
 function Playlist() {
     const [music, setMusic] = useState([]);
+    const [checkItems, setCheckItems] = useState(new Set);
+    const [isAllChecked, setIsAllChecked] = useState(false);
 
     useEffect(() => {
         getDefaultMusic();
     }, []);
 
     const getDefaultMusic = () => {
-        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/unused`)
+        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/default`)
         .then(response => {
             const data = response.data;
             if (data && data.length > 0) {
@@ -46,52 +48,89 @@ function Playlist() {
         });
     }
 
-    const addToUserProfile = () => {
-        axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`)
+    const addToUserProfile = (event) => {
+        event.preventDefault();
+
+        // axios를 사용한 POST 요청
+        axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`)
         .then(response => {
-            
+            console.log('서버 응답:', response.data);
         })
         .catch(error => {
-            console.error('Error addToUserProfile:', error);
+            console.error('서버 요청 오류:', error);
         });
+    }
+
+    const checkItemHandler = (id, isChecked) => {
+        if (isChecked) {
+          checkItems.add(id) 
+          setCheckItems(checkItems)
+        } else if (!isChecked) {
+          checkItems.delete(id)
+          setCheckItems(checkItems)
+        }
+        console.log(checkItems)
+    }  
+
+    const allCheckedHandler = ({target}) => {
+        console.log(`all check : ${target.checked}`)
+        if (target.checked) {
+          setCheckItems(new Set(music.map((checkbox, index) => `id`+index)))
+          setIsAllChecked(true)
+        } else {
+          checkItems.clear();
+          setCheckItems(checkItems);
+          setIsAllChecked(false)
+        }
     }
 
     return (
         <div className='text-center py-10'>
-            <button 
-                onClick={getUnshownMusic} 
-                class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
-            >
-                Get Youtube Music
-            </button>
-            <button 
-                onClick={addToUserProfile} 
-                class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
-            >
-                Add to My Profile
-            </button>
-            <div className="text-center py-10">
-
-                <table className="w-full">
-                    {/* <thead className="bg-gray-800">
-                    { <tr>
-                        <th className="p-3 text-left">#</th>
-                        <th className="p-3 text-left">제목</th>
-                    </tr> }
-                    </thead> */}
-                    <tbody>
-                    {music.map((music, index) => (
-                        <MusicBox 
-                            index={index}
-                            id={music.video_id} 
-                            title={music.title} 
-                            image={music.thumbnail} 
-                        />
-                    ))}
-                    </tbody>
-                </table>
-                {/* <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-custom-dark-text sm:text-6xl">Playlist Page</h1> */}
-            </div>
+            <form onSubmit={addToUserProfile}>
+                <button 
+                    onClick={getUnshownMusic} 
+                    class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
+                >
+                    Get Youtube Music
+                </button>
+                <button 
+                    type="submit"
+                    class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
+                >
+                    Add to My Profile
+                </button>
+                <div className="text-center py-10">
+                    <table className="w-full">
+                        <thead>
+                            <tr>
+                                <th className="p-3 text-left">
+                                    <label className="inline-flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="form-checkbox h-5 w-5 text-blue-600"
+                                            onChange={allCheckedHandler} 
+                                        />
+                                    </label>
+                                </th>
+                                <th className="p-3 text-left">No</th>
+                                <th className="p-3 text-center">Title</th>
+                            </tr> 
+                        </thead>
+                        <tbody>
+                            {music.map((music, index) => (
+                                <MusicBox 
+                                    index={index}
+                                    id={music.video_id} 
+                                    title={music.title} 
+                                    image={music.thumbnail}
+                                    checkItemHandler={checkItemHandler}
+                                />
+                            ))}
+                        </tbody>
+                    </table>
+                    {/* <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-custom-dark-text sm:text-6xl">Playlist Page</h1> */}
+                </div>
+            </form>
         </div>
     )
 }

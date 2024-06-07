@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const youtubeController = require('../controllers/youtubeController');
 const sequelize = require('../config/database');
+
+const youtubeController = require('../controllers/youtubeController');
+const userController = require('../controllers/userController');
 
 function authenticateUser(req, res, next) {
   if (!req.user || !req.user.accessToken) {
@@ -22,9 +24,9 @@ router.get('/dbtest', async (req, res) => {
       }
 })
 
-router.get('/music/unused', youtubeController.getUnusedMusic);
+router.get('/music/default', youtubeController.getDefaultMusic);
 router.get('/music/unshown', youtubeController.getUnshownMusic);
-router.get('/users/profile/music', youtubeController.addToUserProfile);
+router.get('/users/profile/music', userController.addToUserProfile);
 //router.get('/youtube/data', youtubeController.getLikedYoutubeMusic);
 // router.get('/test', youtubeController.getSpotifyAccessToken, youtubeController.getSpotifyMusicInfo);
 

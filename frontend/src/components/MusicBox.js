@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const MusicBox = ({ index, id, title, image }) => {
+const MusicBox = ({ index, id, title, image, checkItemHandler }) => {
+  const [checked, setChecked] = useState(false); // 체크 여부 판단
+
+  const checkHandled = ({target}) => {
+    setChecked(!checked);
+    checkItemHandler(target.id, target.checked);
+  }
+
   return (
-    <tr key={id} className="border-b border-gray-700 last:border-none">
+    <tr className="border-b border-gray-700 last:border-none">
     <td>
         <label className="inline-flex items-center">
-          <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" />
+          <input 
+            id={id}
+            type="checkbox" 
+            checked={checked} 
+            onChange={(e) => checkHandled(e)} 
+            className="form-checkbox h-5 w-5 text-blue-600" 
+          />
         </label>
     </td>
     {<td className="p-3">{index + 1}</td> }
