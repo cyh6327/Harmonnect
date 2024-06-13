@@ -5,11 +5,11 @@ import axiosInstance from '../utils/axiosInstance';
 
 function Playlist() {
     const [music, setMusic] = useState([]);
-    const [checkItems, setCheckItems] = useState(new Set);
-    const [isAllChecked, setIsAllChecked] = useState(false);
+    const [allChecked, setAllChecked] = useState(false);
 
     useEffect(() => {
         getDefaultMusic();
+        setMusic(music.map(item => ({...item, isChecked: false})));
     }, []);
 
     const getDefaultMusic = () => {
@@ -17,8 +17,13 @@ function Playlist() {
         .then(response => {
             const data = response.data;
             if (data && data.length > 0) {
-                console.log('Music list:', data);
-                setMusic(data.data);
+                const music = data.data;
+                const newMusic = music.map(item => ({
+                    ...item,
+                    "isChecked" : false
+                }));
+                console.log('Music list:', newMusic);
+                setMusic(newMusic);
             } else {
                 // musicList가 없을 때 처리
                 console.log(data.message);
@@ -61,27 +66,17 @@ function Playlist() {
         });
     }
 
-    const checkItemHandler = (id, isChecked) => {
-        if (isChecked) {
-          checkItems.add(id) 
-          setCheckItems(checkItems)
-        } else if (!isChecked) {
-          checkItems.delete(id)
-          setCheckItems(checkItems)
-        }
-        console.log(checkItems)
+    const checkItemHandler = (index) => (event) => {
+        const newMusic = [...music];
+        newMusic[index].isChecked = event.target.checked;
+        console.log(`checked music info ..... ${JSON.stringify(newMusic)}`)
+        setMusic(newMusic);
     }  
 
-    const allCheckedHandler = ({target}) => {
-        console.log(`all check : ${target.checked}`)
-        if (target.checked) {
-          setCheckItems(new Set(music.map((checkbox, index) => `id`+index)))
-          setIsAllChecked(true)
-        } else {
-          checkItems.clear();
-          setCheckItems(checkItems);
-          setIsAllChecked(false)
-        }
+    const allCheckedHandler = (checked) => {
+        console.log(`all check click, checked : ${checked}`)
+        setMusic(music.map(item => ({...item, isChecked: checked})));
+        console.log(`all checked music info : ${JSON.stringify(music)}`)
     }
 
     return (
@@ -108,7 +103,7 @@ function Playlist() {
                                         <input 
                                             type="checkbox" 
                                             className="form-checkbox h-5 w-5 text-blue-600"
-                                            onChange={allCheckedHandler} 
+                                            onChange={(e) => allCheckedHandler(e.target.checked)}
                                         />
                                     </label>
                                 </th>
@@ -123,7 +118,8 @@ function Playlist() {
                                     id={music.video_id} 
                                     title={music.title} 
                                     image={music.thumbnail}
-                                    checkItemHandler={checkItemHandler}
+                                    isChecked={music.isChecked}
+                                    onCheck={checkItemHandler(index)}
                                 />
                             ))}
                         </tbody>
