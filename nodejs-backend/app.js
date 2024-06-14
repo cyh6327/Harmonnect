@@ -47,6 +47,7 @@ app.get('/test', (req, res) => {
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.authenticate('session'));
+app.use(express.json()); // JSON 형태의 본문을 파싱
 
 app.use('/api', apiRoutes);
 // 인증 라우터

@@ -55,9 +55,15 @@ function Playlist() {
 
     const addToUserProfile = (event) => {
         event.preventDefault();
+        const selectedMusic = music.filter((item) => item.isChecked);
+        const selectedMusicId = selectedMusic.map((item) => item.id);
 
-        // axios를 사용한 POST 요청
-        axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`)
+        console.log(`addToUserProfile........ selectedMusicId : ${selectedMusicId}`);
+
+        //axios를 사용한 POST 요청
+        axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
+            musicId : selectedMusicId
+        })
         .then(response => {
             console.log('서버 응답:', response.data);
         })
