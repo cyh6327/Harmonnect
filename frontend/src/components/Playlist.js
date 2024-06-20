@@ -15,18 +15,17 @@ function Playlist() {
     const getDefaultMusic = () => {
         axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/default`)
         .then(response => {
-            const data = response.data;
-            if (data && data.length > 0) {
-                const music = data.data;
-                const newMusic = music.map(item => ({
+            const defaultMusic = response.data;
+            if (defaultMusic && defaultMusic.length > 0) {
+                console.log('Music list:', defaultMusic);
+                const newMusic = defaultMusic.map(item => ({
                     ...item,
                     "isChecked" : false
                 }));
                 console.log('Music list:', newMusic);
                 setMusic(newMusic);
             } else {
-                // musicList가 없을 때 처리
-                console.log(data.message);
+
             }
         })
         .catch(error => {
@@ -53,22 +52,29 @@ function Playlist() {
         });
     }
 
-    const addToUserProfile = (event) => {
-        event.preventDefault();
+    const addToUserProfile = () => {
         const selectedMusic = music.filter((item) => item.isChecked);
-        const selectedMusicId = selectedMusic.map((item) => item.id);
+        const selectedMusicId = selectedMusic.map(item => item.id);
 
-        console.log(`addToUserProfile........ selectedMusicId : ${selectedMusicId}`);
+        console.log(`addToUserProfile........ selectedMusicId : ${Array.isArray(selectedMusicId)}`);
 
         //axios를 사용한 POST 요청
         axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
             musicId : selectedMusicId
         })
         .then(response => {
-            console.log('서버 응답:', response.data);
+            const data = response.data;
+            console.log(`added music ..... ${JSON.stringify(data)}`)
+            if (data && data.length > 0) {
+                console.log('Music list:', data);
+                // 기존 음악에서 추가된 음악은 제거
+                setMusic(music => music.filter(object => !data.map(obj => obj.id).includes(object.id)));
+                console.log('after add Music :', music);
+            } else {
+            }
         })
         .catch(error => {
-            console.error('서버 요청 오류:', error);
+            console.error('Error fetching data:', error);
         });
     }
 
@@ -87,7 +93,6 @@ function Playlist() {
 
     return (
         <div className='text-center py-10'>
-            <form onSubmit={addToUserProfile}>
                 <button 
                     onClick={getUnshownMusic} 
                     class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
@@ -95,7 +100,7 @@ function Playlist() {
                     Get Youtube Music
                 </button>
                 <button 
-                    type="submit"
+                    onClick={addToUserProfile} 
                     class="bg-gray-700 text-white font-semibold py-2 px-4 rounded"
                 >
                     Add to My Profile
@@ -132,7 +137,6 @@ function Playlist() {
                     </table>
                     {/* <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-custom-dark-text sm:text-6xl">Playlist Page</h1> */}
                 </div>
-            </form>
         </div>
     )
 }

@@ -27,11 +27,11 @@ async function insertMusics(user, musicVideos) {
     });
 }
 
-exports.getDefaultMusic = (req, res) => {
+exports.getDefaultMusic = async (req, res) => {
     const userId = req.user.id;
     console.log(`getDefaultMusic............................... userId = ${userId}`);
 
-    const defaultMusics = Music.findAll({ where : { status : 'default', user_id : userId } });
+    const defaultMusics = await Music.findAll({ where : { status : 'default', user_id : userId } });
 
     if(defaultMusics.length > 0) {
         res.json(defaultMusics);
