@@ -44,15 +44,15 @@ exports.getUnshownMusic = async (req, res) => {
     const userId = req.user.id;
     console.log(`getUnshownMusic............................... userId = ${userId}`);
 
-    // const unshownCount = await Music.count({ where: { status: 'unshown' } }); 
+    const unshownCount = await Music.count({ where: { status: 'unshown' } }); 
     
-    // // unShownMusics 가 10 미만이면 유튜브 api 로 데이터를 받아온다
-    // if(unshownCount < 10) {
-    //     await getLikedYoutubeMusic(req.user);
-    // } 
+    // unShownMusics 가 10 미만이면 유튜브 api 로 데이터를 받아온다
+    if(unshownCount < 10) {
+        await getLikedYoutubeMusic(req.user);
+    } 
 
-    // const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 });
-    // console.log(`unshownMusics..... ${JSON.stringify(unshownMusics)}`)
+    const unshownMusics = await Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 });
+    console.log(`unshownMusics..... ${JSON.stringify(unshownMusics)}`)
 
     Music.findAll({ where: { status: 'unshown' , user_id : userId }, limit : 10 })
     .then(musics => {
@@ -71,10 +71,10 @@ exports.getUnshownMusic = async (req, res) => {
             return Music.update(data, { where: { id: data.id } });
         }));
     })
-    .then(() => {
-        console.log('데이터가 업데이트되었습니다.');
-        return Music.findAll({ limit: 10 });
-    })
+    // .then(() => {
+    //     console.log('데이터가 업데이트되었습니다.');
+    //     return Music.findAll({ limit: 10 });
+    // })
     .then(updatedMusics => {
         // 클라이언트에 업데이트된 User 데이터를 JSON 형태로 응답
         res.json(updatedMusics);

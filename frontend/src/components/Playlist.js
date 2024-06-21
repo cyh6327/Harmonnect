@@ -35,13 +35,28 @@ function Playlist() {
 
     const getUnshownMusic = () => {
         axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/music/unshown`)
+        // .then(response => {
+        //     const defaultMusic = response.data;
+        //     if (defaultMusic && defaultMusic.length > 0) {
+        //         console.log('Music list:', defaultMusic);
+        //         const newMusic = defaultMusic.map(item => ({
+        //             ...item,
+        //             "isChecked" : false
+        //         }));
+        //         console.log('Music list:', newMusic);
+        //         setMusic(newMusic);
+        //     } else {
+
+        //     }
+        // })
         .then(response => {
             const data = response.data;
             console.log(`responed unshown music ..... ${JSON.stringify(data)}`)
             if (data && data.length > 0) {
                 console.log('Music list:', data);
+                const mergedMusic = [...music, ...data];
                 setMusic(data);
-                console.log('after save Music :', music);
+                console.log('after merge Music :', mergedMusic);
             } else {
                 // musicList가 없을 때 처리
                 console.log(data.message);

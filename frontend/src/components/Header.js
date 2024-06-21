@@ -6,6 +6,7 @@ import { FaSignInAlt, FaSignOutAlt, FaUser, FaMoon, FaSun } from 'react-icons/fa
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useDarkMode } from '../contexts/DarkModeContext';
 import Toast from './Toast';
+import axiosInstance from '../utils/axiosInstance';
 
 function Header() {
   const { darkMode, toggleDarkMode } = useDarkMode();
@@ -33,7 +34,36 @@ function Header() {
   };
 
   const handleProfile = () => {
-    // 프로필 API 호출
+    const returnObj = {};
+    // 이용자 정보 가져오기
+    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`, {
+
+    })
+    .then(response => {
+        const data = response.data;
+        if (data && data.length > 0) {
+          returnObj.userInfo = data;
+        } else {
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+
+    // 이용자 음악 데이터 가져오기
+    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
+      
+    })
+    .then(response => {
+        const data = response.data;
+        if (data && data.length > 0) {
+          returnObj.musicList = data;
+        } else {
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
   };
 
   const handleToastClose = () => {
