@@ -34,36 +34,36 @@ function Header() {
   };
 
   const handleProfile = () => {
-    const returnObj = {};
-    // 이용자 정보 가져오기
-    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`, {
+    // const returnObj = {};
+    // // 이용자 정보 가져오기
+    // axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`, {
 
-    })
-    .then(response => {
-        const data = response.data;
-        if (data && data.length > 0) {
-          returnObj.userInfo = data;
-        } else {
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
+    // })
+    // .then(response => {
+    //     const data = response.data;
+    //     if (data && data.length > 0) {
+    //       returnObj.userInfo = data;
+    //     } else {
+    //     }
+    // })
+    // .catch(error => {
+    //     console.error('Error fetching data:', error);
+    // });
 
-    // 이용자 음악 데이터 가져오기
-    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
+    // // 이용자 음악 데이터 가져오기
+    // axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
       
-    })
-    .then(response => {
-        const data = response.data;
-        if (data && data.length > 0) {
-          returnObj.musicList = data;
-        } else {
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
+    // })
+    // .then(response => {
+    //     const data = response.data;
+    //     if (data && data.length > 0) {
+    //       returnObj.musicList = data;
+    //     } else {
+    //     }
+    // })
+    // .catch(error => {
+    //     console.error('Error fetching data:', error);
+    // });
   };
 
   const handleToastClose = () => {
@@ -102,9 +102,11 @@ function Header() {
               <button onClick={handleLogout}>
                   <FaSignOutAlt size={24} />
               </button>
-              <button onClick={handleProfile}>
-                  <FaUser size={24} />
-              </button>
+              <Link to="/profile">
+                <button onClick={handleProfile}>
+                    <FaUser size={24} />
+                </button>
+              </Link>
               <button onClick={toggleDarkMode}>
                   {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
               </button>
