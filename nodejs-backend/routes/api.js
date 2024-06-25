@@ -27,6 +27,7 @@ router.get('/dbtest', async (req, res) => {
 router.get('/music/default', youtubeController.getDefaultMusic);
 router.get('/music/unshown', youtubeController.getUnshownMusic);
 router.post('/users/profile/music', userController.addToUserProfile);
+router.get('/users/profile/info', userController.getUserProfile);
 //router.get('/youtube/data', youtubeController.getLikedYoutubeMusic);
 // router.get('/test', youtubeController.getSpotifyAccessToken, youtubeController.getSpotifyMusicInfo);
 

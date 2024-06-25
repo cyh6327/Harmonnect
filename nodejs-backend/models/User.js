@@ -29,6 +29,10 @@ const User = sequelize.define('User', {
   },
   expirydate: {
     type: DataTypes.DATE
+  },
+  introduction: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'Users',

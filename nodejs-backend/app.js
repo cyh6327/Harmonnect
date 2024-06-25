@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
-const { sequelize } = require('./models/Index')
+const { sequelize, User } = require('./models/Index')
 
 const corsOptions = {
   origin: 'http://localhost:3000', // 허용할 도메인
@@ -25,6 +25,17 @@ sequelize.sync()
   .catch(error => {
     console.error('테이블 동기화 중 오류가 발생하였습니다:', error);
   });
+
+// User 테이블 동기화
+async function syncUserModel() {
+    try {
+        await User.sync({ force: true });
+        console.log('User table recreated successfully.');
+    } catch (error) {
+        console.error('Error recreating User table:', error);
+    }
+}
+//syncUserModel();
 
 app.use(cors(corsOptions));
 

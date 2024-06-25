@@ -36,6 +36,7 @@ module.exports = function(passport) {
           const user = await User.findByPk(data.id);
           if (user) {
             user.accessToken = data.accessToken;  // `accessToken`도 복원
+            user.introduction = data.introduction;
             done(null, user);
           } else {
             done(new Error('User not found'), null);

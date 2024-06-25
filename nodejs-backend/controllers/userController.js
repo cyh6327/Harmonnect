@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const Music = require('../models/Music');
+const { Music, Friend } = require('../models/Index');
 
 exports.addToUserProfile = async (req, res) => {
     const userId = req.user.id;
@@ -9,7 +9,7 @@ exports.addToUserProfile = async (req, res) => {
     console.log(Array.isArray(musicIdList));
 
     await Music.update(
-        { status : 'added' },
+        { status : 'added', profile_added_date : new Date() },
         { where: { id: { [Op.in]: musicIdList } } }
     )
     .then(()=> {
@@ -23,4 +23,29 @@ exports.addToUserProfile = async (req, res) => {
     .catch(err => {
         console.error('데이터 업데이트 중 오류 발생:', err);
     });
+}
+
+exports.getUserProfile = async (req, res) => {
+    const userId = req.user.id;
+    console.log(`getUserProfile... userId = ${userId}`);
+
+    let returnObj = {};
+
+    const userInfo = {
+        "name" : req.user.name,
+        "introduction" : req.user.introduction
+    }
+    console.log(`userInfo... ${JSON.stringify(userInfo)}`);
+    returnObj.userInfo = userInfo;
+
+    // TODO : 추후 데이터 추가하고 주석 풀기
+    // const freinds = await Friend.findAll({ where : { user_id : userId } });
+    // console.log(`freinds... ${JSON.stringify(freinds)}`);
+    // returnObj.friends = freinds;
+
+    const recentAddedMusic = await Music.findAll({ where : { status : 'added', user_id : userId }, limit : 5 , order: [['profile_added_date', 'ASC']]});
+    console.log(`recentAddedMusic... ${JSON.stringify(recentAddedMusic)}`);
+    returnObj.recentAddedMusic = recentAddedMusic;
+    
+    res.json(returnObj);
 }

@@ -33,22 +33,21 @@ function Header() {
       }
   };
 
-  const handleProfile = () => {
-    // const returnObj = {};
-    // // 이용자 정보 가져오기
-    // axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`, {
-
-    // })
-    // .then(response => {
-    //     const data = response.data;
-    //     if (data && data.length > 0) {
-    //       returnObj.userInfo = data;
-    //     } else {
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error fetching data:', error);
-    // });
+  const handleProfile = async () => {
+    const returnObj = {};
+    // 이용자 정보 가져오기
+    await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`)
+    .then(response => {
+        const data = response.data;
+        console.log(data)
+        if (data && data.length > 0) {
+          returnObj.userInfo = data;
+        } else {
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
 
     // // 이용자 음악 데이터 가져오기
     // axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
