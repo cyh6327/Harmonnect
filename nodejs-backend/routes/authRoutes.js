@@ -3,7 +3,10 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 
 router.get('/google', authController.googleLogin);
-router.get('/google/callback', authController.googleCallback, authController.postGoogleLogin);
+router.get('/google/callback', authController.googleCallback);
+
+router.get('/kakao', authController.kakaoLogin);
+router.get('/kakao/callback', authController.kakaoCallback);
 
 // 로그아웃 라우트
 router.get('/logout', (req, res) => {

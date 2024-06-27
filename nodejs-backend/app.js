@@ -1,13 +1,16 @@
 require('dotenv').config();
-const passport = require('passport');
-require('./config/passport')(passport);
+const { passport, googleLogin } = require('./config/passport')
 const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
-const { sequelize, User } = require('./models/Index')
+const { sequelize, User } = require('./models/Index');
+const isAuthenticated = require('./isAuthenticated'); // 인증 체크 미들웨어
+
+googleLogin();
+//kakaoLogin();
 
 const corsOptions = {
   origin: 'http://localhost:3000', // 허용할 도메인
@@ -43,7 +46,7 @@ app.use(session({
     secret: secret,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // 실제 배포 시에는 true로 설정
+    cookie: { maxAge: 60 * 60 * 1000, secure: false } // 유지시간 : 1시간, 실제 배포 시에는 secure true로 설정
 }));
 
 app.get('/', async (req, res) => {
@@ -59,6 +62,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.authenticate('session'));
 app.use(express.json()); // JSON 형태의 본문을 파싱
+
+// 모든 라우팅 요청에 대해 인증 체크 미들웨어를 적용
+app.use((req, res, next) => {
+  // 모든 요청에 대해 인증 체크
+  if (!req.path.startsWith('/auth')) {
+    return isAuthenticated(req, res, next);
+  }
+  next(); // 그 외의 요청은 다음 미들웨어로 진행
+});
 
 app.use('/api', apiRoutes);
 // 인증 라우터

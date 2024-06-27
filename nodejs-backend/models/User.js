@@ -7,10 +7,13 @@ const User = sequelize.define('User', {
     autoIncrement: true,
     primaryKey: true
   },
-  google_id: {
+  snsId: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+    allowNull: false
+  },
+  provider: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,
@@ -24,7 +27,7 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     defaulteValue: DataTypes.DATE(Date.now)
   },
-  refreshtoken: {
+  refreshToken: {
     type: DataTypes.TEXT
   },
   expirydate: {
@@ -43,25 +46,5 @@ const User = sequelize.define('User', {
 User.prototype.isAccessTokenExpired = function() {
   return Date.now() >= this.expiryDate;
 };
-
-User.findOrCreateUser = async function(googleProfile) {
-  console.log('Calling findOrCreate with:', googleProfile);
-  const [user, created] = await User.findOrCreate({
-    where: { google_id: googleProfile.id },
-    defaults: { // findOrCreate 메서드의 defaults 옵션은 새로 생성될 때 사용될 기본값 지정
-      google_id: googleProfile.id,
-      name: googleProfile.displayName,
-      email: googleProfile.emails[0].value
-    }
-  });
-
-  if (created) {
-    console.log('새로운 사용자가 생성되었습니다.');
-  } else {
-    console.log('기존의 사용자가 반환되었습니다.');
-  }
-
-  return user;
-}
 
 module.exports = User;
