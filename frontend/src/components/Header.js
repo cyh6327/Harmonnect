@@ -7,20 +7,26 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useDarkMode } from '../contexts/DarkModeContext';
 import Toast from './Toast';
 import axiosInstance from '../utils/axiosInstance';
+import Modal from './Modal';
 
 function Header() {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastSubMessage, setToastSubMessage] = useState('');
+  const [open, setOpen] = useState(false);
 
-  const handleLogin = () => {
-    try {
-        window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google`;
-      } catch (error) {
-        console.log(error);
-      }
-  };
+  const handleLoginModal = (isOpen) => {
+    setOpen(isOpen);
+  } 
+
+  // const handleLogin = () => {
+  //   try {
+  //       window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google`;
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  // };
 
   const handleLogout = async () => {
     try {
@@ -31,38 +37,6 @@ function Header() {
       } catch (error) {
         console.log(error);
       }
-  };
-
-  const handleProfile = async () => {
-    const returnObj = {};
-    // 이용자 정보 가져오기
-    await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/info`)
-    .then(response => {
-        const data = response.data;
-        console.log(data)
-        if (data && data.length > 0) {
-          returnObj.userInfo = data;
-        } else {
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
-
-    // // 이용자 음악 데이터 가져오기
-    // axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/music`, {
-      
-    // })
-    // .then(response => {
-    //     const data = response.data;
-    //     if (data && data.length > 0) {
-    //       returnObj.musicList = data;
-    //     } else {
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error fetching data:', error);
-    // });
   };
 
   const handleToastClose = () => {
@@ -95,16 +69,15 @@ function Header() {
               </nav>
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end space-x-4">
-              <button onClick={handleLogin}>
+              <button onClick={() => handleLoginModal(true)}>
                   <FaSignInAlt size={24} />
+                  <Modal isOpen={open} handleLoginModal={handleLoginModal}/>
               </button>
               <button onClick={handleLogout}>
                   <FaSignOutAlt size={24} />
               </button>
               <Link to="/profile">
-                <button onClick={handleProfile}>
-                    <FaUser size={24} />
-                </button>
+                  <FaUser size={24} />
               </Link>
               <button onClick={toggleDarkMode}>
                   {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}

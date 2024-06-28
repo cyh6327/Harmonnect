@@ -42,9 +42,4 @@ const User = sequelize.define('User', {
   timestamps: false
 });
 
-// accessToken의 만료여부를 체크
-User.prototype.isAccessTokenExpired = function() {
-  return Date.now() >= this.expiryDate;
-};
-
 module.exports = User;

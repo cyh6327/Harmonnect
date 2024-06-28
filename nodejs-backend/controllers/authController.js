@@ -12,6 +12,7 @@ const googleCallback = (req, res, next) => {
       if (!user) {
         return res.redirect('/auth/google'); // Redirect to login page on failure
       }
+      // 세션에 사용자의 인증 상태 저장
       req.logIn(user, (err) => {
         if (err) {
           return next(err);

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { Music, Friend } = require('../models/Index');
 
-exports.addToUserProfile = async (req, res) => {
+const addToUserProfile = async (req, res) => {
     const userId = req.user.id;
     const musicIdList = req.body.musicId;
 
@@ -25,27 +25,43 @@ exports.addToUserProfile = async (req, res) => {
     });
 }
 
-exports.getUserProfile = async (req, res) => {
+const getUserInfo = async (req, res) => {
     const userId = req.user.id;
-    console.log(`getUserProfile... userId = ${userId}`);
-
-    let returnObj = {};
+    console.log(`getUserInfo... userId = ${userId}`);
 
     const userInfo = {
         "name" : req.user.name,
         "introduction" : req.user.introduction
     }
-    console.log(`userInfo... ${JSON.stringify(userInfo)}`);
-    returnObj.userInfo = userInfo;
 
+    console.log(`userInfo... ${JSON.stringify(userInfo)}`);
+    
+    res.json(userInfo);
+}
+
+const getAddedMusic = async (req, res) => {
+    const userId = req.user.id;
+    const recentAddedMusic = await Music.findAll({ 
+        where : { status : 'added', user_id : userId }, 
+        limit : 5,
+        order: [['profile_added_date', 'ASC']]
+    });
+    console.log(`recentAddedMusic... ${JSON.stringify(recentAddedMusic)}`);
+
+    res.json(recentAddedMusic);
+}
+
+const getUserFriends = async (req, res) => {
     // TODO : 추후 데이터 추가하고 주석 풀기
     // const freinds = await Friend.findAll({ where : { user_id : userId } });
     // console.log(`freinds... ${JSON.stringify(freinds)}`);
     // returnObj.friends = freinds;
-
-    const recentAddedMusic = await Music.findAll({ where : { status : 'added', user_id : userId }, limit : 5 , order: [['profile_added_date', 'ASC']]});
-    console.log(`recentAddedMusic... ${JSON.stringify(recentAddedMusic)}`);
-    returnObj.recentAddedMusic = recentAddedMusic;
-    
-    res.json(returnObj);
 }
+
+module.exports = {
+    addToUserProfile,
+    getUserInfo,
+    getAddedMusic,
+    getUserFriends
+};
+  

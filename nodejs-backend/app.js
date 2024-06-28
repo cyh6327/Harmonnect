@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
 const { sequelize, User } = require('./models/Index');
 const isAuthenticated = require('./isAuthenticated'); // 인증 체크 미들웨어
+const morgan = require('morgan'); // 미들웨어 연결
 
 googleLogin();
 //kakaoLogin();
@@ -48,6 +49,13 @@ app.use(session({
     saveUninitialized: true,
     cookie: { maxAge: 60 * 60 * 1000, secure: false } // 유지시간 : 1시간, 실제 배포 시에는 secure true로 설정
 }));
+
+// 로그 기록
+if (process.env.NODE_ENV === 'production') { 
+  app.use(morgan('combined')); // 배포환경이면
+} else {
+  app.use(morgan('dev')); // 개발환경이면
+}
 
 app.get('/', async (req, res) => {
   res.send(`dashboard`);
