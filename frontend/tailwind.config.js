@@ -11,6 +11,9 @@ module.exports = {
         'dark-gradient-from': '#333', // 다크 모드 그라데이션 시작 색상
         'dark-gradient-to': '#666', // 다크 모드 그라데이션 끝 색상
       },
+      fontFamily: {
+        default: ['"Gowun Dodum"', "sans-serif"],
+      },
     }, // 사용자 정의 설정
   },
   variants: {
