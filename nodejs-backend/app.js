@@ -39,7 +39,7 @@ async function syncUserModel() {
         console.error('Error recreating User table:', error);
     }
 }
-//syncUserModel();
+syncUserModel();
 
 app.use(cors(corsOptions));
 

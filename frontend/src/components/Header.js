@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaSignInAlt, FaSignOutAlt, FaUser, FaMoon, FaSun } from 'react-icons/fa';
+import { FaSignInAlt, FaSignOutAlt, FaMoon, FaSun, FaUser, FaUserPlus } from 'react-icons/fa';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useDarkMode } from '../contexts/DarkModeContext';
 import Toast from './Toast';
@@ -15,6 +15,7 @@ function Header() {
   const [showToast, setShowToast] = useState(false);
   const [toastSubMessage, setToastSubMessage] = useState('');
   const [open, setOpen] = useState(false);
+  const [toggleInput, setToggleInput] = useState(false);
 
   const handleLoginModal = (isOpen) => {
     setOpen(isOpen);
@@ -43,6 +44,10 @@ function Header() {
     setShowToast(false);
   };
 
+  const inputToggle = () => {
+    setToggleInput(!toggleInput);
+  }
+
   return (
     <header className="dark:bg-custom-dark-bg dark:text-custom-dark-text">
       <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -69,18 +74,32 @@ function Header() {
               </nav>
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end space-x-4">
+              <button>
+                <Link to="/profile">
+                    <FaUser size={20} />
+                </Link>
+              </button>
+              <button onClick={inputToggle}>
+                  <FaUserPlus size={24} />
+              </button>
+              {toggleInput && (
+                <div className="mt-2">
+                  <input 
+                    type="text" 
+                    className="border border-gray-300 p-2 rounded w-full"
+                    placeholder="친구코드"
+                  />
+                </div>
+              )}
+              <button onClick={toggleDarkMode}>
+                  {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
+              </button>
               <button onClick={() => handleLoginModal(true)}>
                   <FaSignInAlt size={24} />
                   <Modal isOpen={open} handleLoginModal={handleLoginModal}/>
               </button>
               <button onClick={handleLogout}>
                   <FaSignOutAlt size={24} />
-              </button>
-              <Link to="/profile">
-                  <FaUser size={24} />
-              </Link>
-              <button onClick={toggleDarkMode}>
-                  {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
               </button>
           </div>
       </nav>

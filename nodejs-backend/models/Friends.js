@@ -3,6 +3,11 @@ const sequelize = require('../config/database'); // Sequelize 설정
 const User = require('./Index')
 
 const Friend = sequelize.define('Friend', {
+    no: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
     userId: {
         type: DataTypes.INTEGER,
         references: {

@@ -8,10 +8,12 @@ import axios from 'axios';
 function Profile() {
   const [userInfo, setUserInfo] = useState({});
   const [recentMusic, setRecentMusic] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
       getUserInfo();
       getAddedMusic();
+      getUserFriends();
   }, []); // 처음 렌더링 될 때 한 번만 실행
 
   const getUserInfo = async () => {
@@ -39,6 +41,22 @@ function Profile() {
         console.log(data)
         if (data && data.length > 0) {
           setRecentMusic(data);
+          console.log(`recentMusic : ${JSON.stringify(recentMusic)}`)
+        } else {
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+  }
+
+  const getUserFriends = async () => {
+    await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/friends`)
+    .then(response => {
+        const data = response.data;
+        console.log(data)
+        if (data && data.length > 0) {
+          setFriends(data);
           console.log(`recentMusic : ${JSON.stringify(recentMusic)}`)
         } else {
         }

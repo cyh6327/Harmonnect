@@ -7,14 +7,9 @@ const RecentMusic = ({ index, id, title, image }) => {
         <img src={image} alt={title} className="w-12 h-12 mr-4"/>
         <div className="flex-grow">
         <div className="flex items-center">
-            <span className="font-semibold">{title}</span>
+            <span className="font-semibold hover:text-violet-400"><a href={`https://www.youtube.com/watch?v=${id}`} target='_blank'>{title}</a></span>
         </div>
-        {/* <div className="text-gray-400">{music.artist}</div> */}
         </div>
-        {/* <div className="hidden md:block text-gray-400">{music.album}</div>
-        <div className="flex items-center ml-auto">
-        <span className="text-gray-400">{music.duration}</span>
-        </div> */}
     </li>
   );
 };

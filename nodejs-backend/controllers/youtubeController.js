@@ -91,7 +91,7 @@ exports.getUnshownMusic = async (req, res) => {
 }
 
 const getLikedYoutubeMusic = async (user) => {
-    console.log(`getLikedYoutubeMusic................`);
+    console.log(`getLikedYoutubeMusic................user.accessToken = ${user.accessToken}`);
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({
         access_token: user.accessToken

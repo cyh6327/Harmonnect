@@ -1,5 +1,11 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Sequelize 설정
+const crypto = require('crypto');
+
+// SHA-256 해시 함수
+const generateHash = (input) => {
+  return crypto.createHash('sha256').update(input).digest('hex');
+};
 
 const User = sequelize.define('User', {
   id: {
@@ -18,6 +24,11 @@ const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  code: { // 친구 추가시 필요한 개인 고유 코드
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
   },
   email: {
     type: DataTypes.TEXT,
@@ -39,7 +50,15 @@ const User = sequelize.define('User', {
   }
 }, {
   tableName: 'Users',
-  timestamps: false
+  timestamps: false,
+  hooks: {
+    beforeCreate: async (user, options) => {
+      // 각 컬럼의 정보를 조합하여 고유 문자열 생성
+      const uniqueString = `${user.getDataValue('id')}${user.getDataValue('snsId')}${user.getDataValue('name')}`;
+      // 고유 문자열을 해시하여 a 컬럼에 저장
+      user.code = generateHash(uniqueString);
+    }
+  }
 });
 
 module.exports = User;

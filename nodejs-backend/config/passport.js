@@ -36,7 +36,7 @@ const googleLogin = () => {
     console.log(`google profile : ${JSON.stringify(profile)}`)
     try {
         const user = await UserService.findOrCreateUser(profile);
-
+        user.accessToken = accessToken;
         if (user) {
           done(null, user);
         }

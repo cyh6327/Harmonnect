@@ -1,10 +1,20 @@
 import { useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import googleIcon from '../assets/images/btn_google.svg';
 import kakaoIcon from '../assets/images/btn_kakao.svg';
 
 export default function Modal({ isOpen, handleLoginModal }) {
+  const googleLogin = () => {
+    try {
+        window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google`;
+      } catch (error) {
+        console.log(error);
+      }
+  };
+
+  const kakaoLogin = () => {
+  };
+
   return (
       <Dialog className="relative z-10 font-default" open={isOpen} onClose={() => handleLoginModal(false)}> 
         <DialogBackdrop
@@ -19,24 +29,22 @@ export default function Modal({ isOpen, handleLoginModal }) {
             >
                <div className="flex flex-col items-center justify-center bg-neutral-800 rounded-3xl border-neutral-700 border-2 shadow-lg shadow-neutral-800">
                 <div className="text-center my-10">
-                  <h1 className="text-white text-4xl font-bold mb-2">Harmonnect</h1>
-                  <p className="text-white text-lg">환영합니다!</p>
+                  <h1 className="text-white text-xl font-bold mb-2">HARMONNECT</h1>
+                  <p className="text-neutral-300 text-md font-medium">이용하시려면 로그인 해주세요.</p>
                 </div>
 
                 <div className="flex space-x-2 mb-8">
-                  <button className="p-4 bg-neutral-900 rounded-full">
+                  <button className="p-4 bg-neutral-900 rounded-full"
+                    onClick={() => googleLogin(true)}
+                  >
                     <img src={googleIcon} />
                   </button>
-                  <button className="p-4 bg-neutral-900 rounded-full">
+                  <button className="p-4 bg-neutral-900 rounded-full"
+                    onClick={() => kakaoLogin(true)}
+                  >
                     <img src={kakaoIcon} />
                   </button>
                 </div>
-
-                {/* <div>
-                  <button className="h-5 flex mr-2.5 flex w-100">
-                    <img src={googleIcon} />
-                  </button>
-                </div> */}
               </div>
             </DialogPanel>
           </div>
