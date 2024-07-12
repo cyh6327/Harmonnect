@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 // SHA-256 해시 함수
 const generateHash = (input) => {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return crypto.createHash('sha256').update(input).digest('hex').substring(0, 10);
 };
 
 const User = sequelize.define('User', {

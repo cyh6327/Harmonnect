@@ -1,28 +1,30 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Sequelize 설정
-const User = require('./Index')
 
 const Friend = sequelize.define('Friend', {
-    no: {
+    requesterId: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    userId: {
-        type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
-            model: User,
+            model: 'User',
             key: 'id'
         }
     },
-    friendId: {
+    receiverId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
-            model: User,
+            model: 'User',
             key: 'id'
         }
+    },
+    status: {
+        type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending',
+        allowNull: false
     }
 }, {
+    tableName: 'Friend',
     timestamps: true
 });
 

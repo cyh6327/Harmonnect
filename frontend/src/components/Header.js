@@ -16,18 +16,11 @@ function Header() {
   const [toastSubMessage, setToastSubMessage] = useState('');
   const [open, setOpen] = useState(false);
   const [toggleInput, setToggleInput] = useState(false);
+  const [friendCode, setFriendCode] = useState('');
 
   const handleLoginModal = (isOpen) => {
     setOpen(isOpen);
   } 
-
-  // const handleLogin = () => {
-  //   try {
-  //       window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google`;
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  // };
 
   const handleLogout = async () => {
     try {
@@ -35,9 +28,9 @@ function Header() {
         await axios.get(`${process.env.REACT_APP_API_BASE_URL}/auth/logout`);
         setToastMessage('로그아웃 되었습니다.');
         setShowToast(true);
-      } catch (error) {
+    } catch (error) {
         console.log(error);
-      }
+    }
   };
 
   const handleToastClose = () => {
@@ -47,6 +40,37 @@ function Header() {
   const inputToggle = () => {
     setToggleInput(!toggleInput);
   }
+
+  const handleInputChange = (e) => {
+    setFriendCode(e.target.value);
+  };
+
+  const addFriend = async (e) => {
+    if (e.key === 'Enter') {
+      try {
+          console.log(`add friend ... friendCode : ${friendCode}`);
+          axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/friend`, {
+            friendCode : friendCode
+          })
+          .then(response => {
+              const data = response.data;
+              console.log(`add friend info ..... ${JSON.stringify(data)}`)
+              if (data && data.length > 0) {
+                setToastMessage('친구 요청을 보냈습니다.');
+                setShowToast(true);
+              } else {
+                setToastMessage('잘못된 친구 코드입니다.');
+                setShowToast(true);
+              }
+          })
+          .catch(error => {
+              console.error('Error fetching data:', error);
+          });
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  };
 
   return (
     <header className="dark:bg-custom-dark-bg dark:text-custom-dark-text">
@@ -87,7 +111,9 @@ function Header() {
                   <input 
                     type="text" 
                     className="border border-gray-300 p-2 rounded w-full"
-                    placeholder="친구코드"
+                    onKeyDown={addFriend}
+                    onChange={handleInputChange}
+                    placeholder="친구코드 입력"
                   />
                 </div>
               )}

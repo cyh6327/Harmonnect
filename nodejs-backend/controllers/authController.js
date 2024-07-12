@@ -10,13 +10,15 @@ const googleCallback = (req, res, next) => {
         return next(err);
       }
       if (!user) {
-        return res.redirect('/auth/google'); // Redirect to login page on failure
+        req.session.message = '로그인에 실패하였습니다.';
+        return res.redirect(`${process.env.CLIENT_URL}/`);
       }
       // 세션에 사용자의 인증 상태 저장
       req.logIn(user, (err) => {
         if (err) {
           return next(err);
         }
+        req.session.message = '로그인 되었습니다.';
         return res.redirect(`${process.env.CLIENT_URL}/`);
       });
     })(req, res, next);

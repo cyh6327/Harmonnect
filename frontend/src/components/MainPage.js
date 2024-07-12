@@ -1,13 +1,40 @@
-import React, { useState } from 'react';
-
-const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
-]
+import React, { useState, useEffect } from 'react';
+import Toast from './Toast';
+import axios from 'axios';
 
 function MainPage() {
+  const navigation = [
+    { name: 'Product', href: '#' },
+    { name: 'Features', href: '#' },
+    { name: 'Marketplace', href: '#' },
+    { name: 'Company', href: '#' },
+  ]
+
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [loginMsg, setLoginMsg] = useState('');
+
+  useEffect(() => {
+    axios.get('/')
+      .then(response => {
+        setLoginMsg(response.data.message); // 서버에서 받은 메시지 설정
+        console.log(loginMsg)
+      })
+      .then(() => {
+        if(loginMsg) {
+          setToastMessage(loginMsg);
+          setShowToast(true);
+        }
+      })
+      .catch(error => {
+        console.error('데이터를 가져오는 동안 오류 발생:', error);
+      });
+  }, []);
+
+  const handleToastClose = () => {
+    setShowToast(false);
+  };
+
   return (
     <div className='text-center'>
       <div className='text-center flex flex-col justify-center items-center h-full space-y-4'>
@@ -26,6 +53,11 @@ function MainPage() {
          </a>
        </div>
       </div>
+      <Toast 
+      message={toastMessage} 
+      show={showToast} 
+      onClose={handleToastClose} 
+    />
     </div>
   );
 }

@@ -30,6 +30,7 @@ router.post('/users/profile/music', userController.addToUserProfile);
 router.get('/users/profile/info', userController.getUserInfo);
 router.get('/users/profile/music', userController.getAddedMusic);
 router.get('/users/profile/friends', userController.getUserFriends);
+router.post('/users/friend', userController.addFriend); // 친구 추가
 //router.get('/youtube/data', youtubeController.getLikedYoutubeMusic);
 // router.get('/test', youtubeController.getSpotifyAccessToken, youtubeController.getSpotifyMusicInfo);
 

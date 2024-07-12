@@ -1,14 +1,16 @@
 require('dotenv').config();
 const { passport, googleLogin } = require('./config/passport')
 const express = require('express');
+const http = require('http');
 const session = require('express-session');
 const crypto = require('crypto');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
-const { sequelize, User } = require('./models/Index');
+const { sequelize, User, Friend } = require('./models/Index');
 const isAuthenticated = require('./isAuthenticated'); // 인증 체크 미들웨어
 const morgan = require('morgan'); // 미들웨어 연결
+const socketIo = require('socket.io');
 
 googleLogin();
 //kakaoLogin();
@@ -20,7 +22,18 @@ const corsOptions = {
 };
 
 const app = express();
+const server = http.createServer(app);
 const secret = crypto.randomBytes(64).toString('hex');
+
+// Socket.IO를 서버에 연결합니다.
+const io = socketIo(server, {
+  cors: {
+    origin: "*", // 모든 출처 허용 (보안상 적절히 설정 필요)
+  },
+});
+
+// ./sockets/index.js 를 가져온다(파일명을 명시하지 않을시 index.js 파일이 존재하면 index.js 파일을 가져온다)
+require('./sockets')(io);
 
 sequelize.sync()
   .then(() => {
@@ -39,7 +52,17 @@ async function syncUserModel() {
         console.error('Error recreating User table:', error);
     }
 }
-syncUserModel();
+//syncUserModel();
+
+async function syncFriendModel() {
+  try {
+      await Friend.sync({ force: true });
+      console.log('User table recreated successfully.');
+  } catch (error) {
+      console.error('Error recreating User table:', error);
+  }
+}
+//syncFriendModel();
 
 app.use(cors(corsOptions));
 
@@ -58,7 +81,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.get('/', async (req, res) => {
-  res.send(`dashboard`);
+  const loginMsg = req.session.message; // 로그인 성공/실패 메시지
+  delete req.session.message; // 메시지 삭제
+
+  res.json({ loginMsg });
 });
 
 app.get('/test', (req, res) => {
@@ -85,8 +111,6 @@ app.use('/api', apiRoutes);
 app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = app;

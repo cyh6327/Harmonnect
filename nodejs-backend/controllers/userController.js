@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Music, Friend } = require('../models/Index');
+const { Music, Friend, User } = require('../models/Index');
 
 const addToUserProfile = async (req, res) => {
     const userId = req.user.id;
@@ -58,10 +58,37 @@ const getUserFriends = async (req, res) => {
     // returnObj.friends = freinds;
 }
 
+const addFriend = async (req, res) => {
+    const requesterId = req.user.id;
+    const friendCode = req.body.friendCode;
+
+    console.log(`addFriend............................... requesterId = ${requesterId} , friendCode = ${friendCode}`);
+
+    try {
+        const receiver = await User.findOne({ 
+            where: { code: friendCode }
+        });
+		
+		const receiverId = receiver ? receiver.get('id') : null;
+    
+        if (!requesterId || !receiverId) {
+            throw new Error('User not found');
+        }
+      
+        // 친구 요청을 생성
+        await Friend.create({
+            requesterId: requesterId,
+            receiverId: receiverId
+        });
+    } catch (error) {
+    console.error('Error sending friend request:', error);
+  }
+}
+
 module.exports = {
     addToUserProfile,
     getUserInfo,
     getAddedMusic,
-    getUserFriends
+    getUserFriends,
+    addFriend
 };
-  

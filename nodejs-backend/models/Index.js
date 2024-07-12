@@ -1,10 +1,14 @@
 const sequelize = require('../config/database');
 const User = require('./User');
 const Music = require('./Music');
-const Friend = require('./Friends');
+const Friend = require('./Friend');
 
-User.belongsToMany(User, { through: Friend, as: 'Friends', foreignKey: 'userId' });
-User.belongsToMany(User, { through: Friend, as: 'UserFriends', foreignKey: 'friendId' });
+User.belongsToMany(User, { through: Friend, as: 'Friends', foreignKey: 'requesterId', otherKey: 'receiverId' });
+User.belongsToMany(User, { through: Friend, as: 'UserFriends', foreignKey: 'receiverId', otherKey: 'requesterId' });
+
+// 양방향
+Friend.belongsTo(User, { as: 'Requester', foreignKey: 'requesterId' });
+Friend.belongsTo(User, { as: 'Receiver', foreignKey: 'receiverId' });
 
 module.exports = {
     User,
