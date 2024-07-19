@@ -1,0 +1,6 @@
+@import 'tailwindcss/tailwind.css';
+
+/* Custom styles for React Toastify */
+.toast-default-font {
+  @apply font-default;
+}

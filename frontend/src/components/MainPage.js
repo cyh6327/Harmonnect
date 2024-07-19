@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Toast from './Toast';
-import axios from 'axios';
+// import Toast from './Toast';
+import axiosInstance from '../utils/axiosInstance';
+import { toast } from 'react-toastify';
 
 function MainPage() {
   const navigation = [
@@ -10,30 +11,41 @@ function MainPage() {
     { name: 'Company', href: '#' },
   ]
 
-  const [toastMessage, setToastMessage] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [loginMsg, setLoginMsg] = useState('');
+  const [toastMsg, setToastMsg] = useState('');
 
   useEffect(() => {
-    axios.get('/')
+    let isMounted = true;
+    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/msg`)
       .then(response => {
-        setLoginMsg(response.data.message); // 서버에서 받은 메시지 설정
-        console.log(loginMsg)
-      })
-      .then(() => {
-        if(loginMsg) {
-          setToastMessage(loginMsg);
-          setShowToast(true);
+        if(isMounted) {
+          console.log(response);
+          setToastMsg(response.data.msg);
         }
       })
       .catch(error => {
-        console.error('데이터를 가져오는 동안 오류 발생:', error);
+        if(isMounted) {
+          setToastMsg(error.response.data.msg);
+        }
       });
+    return () => {
+      isMounted = false;
+    }
   }, []);
 
-  const handleToastClose = () => {
-    setShowToast(false);
-  };
+  useEffect(() => {
+    if (toastMsg) {
+      toast.success(toastMsg, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+  }, [toastMsg]);
 
   return (
     <div className='text-center'>
@@ -53,11 +65,6 @@ function MainPage() {
          </a>
        </div>
       </div>
-      <Toast 
-      message={toastMessage} 
-      show={showToast} 
-      onClose={handleToastClose} 
-    />
     </div>
   );
 }

@@ -4,6 +4,9 @@ import { DarkModeProvider } from './contexts/DarkModeContext';
 import './index.css';
 import AppRoutes from './routes/AppRoutes';
 import io from 'socket.io-client';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../src/assets/styles/index.css'
 
 const SERVER_URL = process.env.REACT_APP_API_BASE_URL; // 서버의 URL
 
@@ -25,6 +28,19 @@ function App() {
 
   return (
     <DarkModeProvider>
+      <ToastContainer
+          toastClassName={"toast-default-font"}
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+      />
       <AppRoutes /> 
     </DarkModeProvider>
 

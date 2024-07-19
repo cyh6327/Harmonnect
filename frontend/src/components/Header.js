@@ -5,15 +5,13 @@ import { Link } from 'react-router-dom';
 import { FaSignInAlt, FaSignOutAlt, FaMoon, FaSun, FaUser, FaUserPlus } from 'react-icons/fa';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useDarkMode } from '../contexts/DarkModeContext';
-import Toast from './Toast';
 import axiosInstance from '../utils/axiosInstance';
 import Modal from './Modal';
+import { showToast } from '../utils/toastNotifications'; // 실제 경로로 대체하세요
 
 function Header() {
   const { darkMode, toggleDarkMode } = useDarkMode();
-  const [toastMessage, setToastMessage] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [toastSubMessage, setToastSubMessage] = useState('');
+  const [toastMsg, setToastMsg] = useState('');
   const [open, setOpen] = useState(false);
   const [toggleInput, setToggleInput] = useState(false);
   const [friendCode, setFriendCode] = useState('');
@@ -24,17 +22,14 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-        console.log("logout")
-        await axios.get(`${process.env.REACT_APP_API_BASE_URL}/auth/logout`);
-        setToastMessage('로그아웃 되었습니다.');
-        setShowToast(true);
+        const response = await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/logout`);
+        showToast('success', response.data.msg);
+        setTimeout(() => {
+          window.location.href = response.data.redirectUrl;
+        }, 2000);
     } catch (error) {
-        console.log(error);
+        showToast('error', error.response.data.msg);
     }
-  };
-
-  const handleToastClose = () => {
-    setShowToast(false);
   };
 
   const inputToggle = () => {
@@ -56,11 +51,9 @@ function Header() {
               const data = response.data;
               console.log(`add friend info ..... ${JSON.stringify(data)}`)
               if (data && data.length > 0) {
-                setToastMessage('친구 요청을 보냈습니다.');
-                setShowToast(true);
+                setToastMsg('친구 요청을 보냈습니다.');
               } else {
-                setToastMessage('잘못된 친구 코드입니다.');
-                setShowToast(true);
+                setToastMsg('잘못된 친구 코드입니다.');
               }
           })
           .catch(error => {
@@ -129,12 +122,6 @@ function Header() {
               </button>
           </div>
       </nav>
-      <Toast 
-      message={toastMessage} 
-      subMessage={toastSubMessage} 
-      show={showToast} 
-      onClose={handleToastClose} 
-    />
   </header>
   );
 }
