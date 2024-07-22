@@ -8,20 +8,20 @@ const googleCallback = (req, res, next) => {
     passport.authenticate('google', { failureRedirect: '/auth/google' }, (err, user, info) => {
       if (err) {
         req.session.message = '로그인에 실패하였습니다.';
-        return res.redirect(`${process.env.CLIENT_URL}/`);
+        return res.redirect(`${process.env.CLIENT_URL}/?division=login`);
       }
       if (!user) {
         req.session.message = '로그인에 실패하였습니다.';
-        return res.redirect(`${process.env.CLIENT_URL}/`);
+        return res.redirect(`${process.env.CLIENT_URL}/?division=login`);
       }
       // 세션에 사용자의 인증 상태 저장
       req.logIn(user, (err) => {
         if (err) {
           req.session.message = '로그인에 실패하였습니다.';
-          return res.redirect(`${process.env.CLIENT_URL}/`);
+          return res.redirect(`${process.env.CLIENT_URL}/?division=login`);
         }
         req.session.message = '로그인 되었습니다.';
-        return res.redirect(`${process.env.CLIENT_URL}/`);
+        return res.redirect(`${process.env.CLIENT_URL}/?division=login`);
       });
     })(req, res, next);
 };

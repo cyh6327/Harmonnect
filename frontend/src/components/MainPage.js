@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 // import Toast from './Toast';
 import axiosInstance from '../utils/axiosInstance';
 import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
 
 function MainPage() {
+  const location = useLocation();
+  const [division, setDivision] = useState(null);
+
   const navigation = [
     { name: 'Product', href: '#' },
     { name: 'Features', href: '#' },
@@ -14,23 +18,31 @@ function MainPage() {
   const [toastMsg, setToastMsg] = useState('');
 
   useEffect(() => {
-    let isMounted = true;
-    axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/msg`)
-      .then(response => {
-        if(isMounted) {
-          console.log(response);
-          setToastMsg(response.data.msg);
-        }
-      })
-      .catch(error => {
-        if(isMounted) {
-          setToastMsg(error.response.data.msg);
-        }
-      });
-    return () => {
-      isMounted = false;
+    const query = new URLSearchParams(location.search);
+    const divisionParam = query.get('division');
+    setDivision(divisionParam);
+  }, [location.search]);
+
+  useEffect(() => {
+    if(division === "login") {
+      let isMounted = true;
+      axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/msg`)
+        .then(response => {
+          if(isMounted) {
+            console.log(response);
+            setToastMsg(response.data.msg);
+          }
+        })
+        .catch(error => {
+          if(isMounted) {
+            setToastMsg(error.response.data.msg);
+          }
+        });
+      return () => {
+        isMounted = false;
+      }
     }
-  }, []);
+  }, [division]);
 
   useEffect(() => {
     if (toastMsg) {
